@@ -21,6 +21,7 @@
 		B944658E255AE98E0044BB23 /* FeedStore.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B944658C255AE98E0044BB23 /* FeedStore.xcdatamodeld */; };
 		B9446595255AEBD60044BB23 /* ManagedCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9446591255AEBD60044BB23 /* ManagedCache.swift */; };
 		B9446597255AEBD60044BB23 /* ManagedFeedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9446593255AEBD60044BB23 /* ManagedFeedImage.swift */; };
+		B94465AC255AEF710044BB23 /* CoreDataFeedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B94465AB255AEF710044BB23 /* CoreDataFeedStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +52,7 @@
 		B944658D255AE98E0044BB23 /* FeedStore.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = FeedStore.xcdatamodel; sourceTree = "<group>"; };
 		B9446591255AEBD60044BB23 /* ManagedCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedCache.swift; sourceTree = "<group>"; };
 		B9446593255AEBD60044BB23 /* ManagedFeedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedFeedImage.swift; sourceTree = "<group>"; };
+		B94465AB255AEF710044BB23 /* CoreDataFeedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataFeedStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +97,7 @@
 			children = (
 				08CE2BA72285BCC600183A1B /* LocalFeedImage.swift */,
 				08CE2BA52285BCB600183A1B /* FeedStore.swift */,
+				B94465AB255AEF710044BB23 /* CoreDataFeedStore.swift */,
 				B944658C255AE98E0044BB23 /* FeedStore.xcdatamodeld */,
 				B9446591255AEBD60044BB23 /* ManagedCache.swift */,
 				B9446593255AEBD60044BB23 /* ManagedFeedImage.swift */,
@@ -237,6 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B94465AC255AEF710044BB23 /* CoreDataFeedStore.swift in Sources */,
 				B9446595255AEBD60044BB23 /* ManagedCache.swift in Sources */,
 				08CE2BA62285BCB600183A1B /* FeedStore.swift in Sources */,
 				B944658E255AE98E0044BB23 /* FeedStore.xcdatamodeld in Sources */,
