@@ -5,6 +5,26 @@
 import XCTest
 import FeedStoreChallenge
 
+class CoreDataFeedStore: FeedStore {
+	/// The completion handler can be invoked in any thread.
+	/// Clients are responsible to dispatch to appropriate threads, if needed.
+	func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+
+	}
+
+	/// The completion handler can be invoked in any thread.
+	/// Clients are responsible to dispatch to appropriate threads, if needed.
+	func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+
+	}
+
+	/// The completion handler can be invoked in any thread.
+	/// Clients are responsible to dispatch to appropriate threads, if needed.
+	func retrieve(completion: @escaping RetrievalCompletion) {
+		completion(.empty)
+	}
+}
+
 class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
     //  ***********************
@@ -20,9 +40,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
     //  ***********************
 
 	func test_retrieve_deliversEmptyOnEmptyCache() {
-//		let sut = makeSUT()
-//
-//		assertThatRetrieveDeliversEmptyOnEmptyCache(on: sut)
+		let sut = makeSUT()
+
+		assertThatRetrieveDeliversEmptyOnEmptyCache(on: sut)
 	}
 
 	func test_retrieve_hasNoSideEffectsOnEmptyCache() {
@@ -94,7 +114,9 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	// - MARK: Helpers
 	
 	private func makeSUT() -> FeedStore {
-		fatalError("Must be implemented")
+		let sut = CoreDataFeedStore()
+
+		return sut
 	}
 	
 }
