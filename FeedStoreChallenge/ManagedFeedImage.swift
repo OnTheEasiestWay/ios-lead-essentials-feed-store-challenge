@@ -1,5 +1,5 @@
 //
-//  ManagedFeedImage+CoreDataClass.swift
+//  ManagedFeedImage.swift
 //  FeedStoreChallenge
 //
 //  Created by liuzhijin on 2020/11/10.
@@ -17,4 +17,15 @@ class ManagedFeedImage: NSManagedObject {
 	@NSManaged var location: String?
 	@NSManaged var imageDescription: String?
 	@NSManaged var cache: ManagedCache
+}
+
+extension ManagedFeedImage {
+	convenience init(from local: LocalFeedImage, in context: NSManagedObjectContext) {
+		self.init(context: context)
+
+		self.id = local.id
+		self.url = local.url
+		self.location = local.location
+		self.imageDescription = location?.description
+	}
 }

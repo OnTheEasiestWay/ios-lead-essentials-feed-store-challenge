@@ -17,6 +17,15 @@ class ManagedCache: NSManagedObject {
 }
 
 extension ManagedCache {
+	var local: [LocalFeedImage] {
+		return feed
+			.compactMap { $0 as? ManagedFeedImage }
+			.map { LocalFeedImage(id: $0.id,
+								  description: $0.imageDescription,
+								  location: $0.location,
+								  url: $0.url)}
+	}
+
 	static func fetchCache(in context: NSManagedObjectContext) throws -> ManagedCache? {
 		let fetchRequest = ManagedCache.fetchRequest()
 		return try context.fetch(fetchRequest).first as? ManagedCache

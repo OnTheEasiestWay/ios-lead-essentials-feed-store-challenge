@@ -29,15 +29,7 @@ public class CoreDataFeedStore: FeedStore {
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
 		let cache = try! ManagedCache.replaceCache(in: backgroundContext)
 		cache.timestamp = timestamp
-		cache.feed = NSOrderedSet(array: feed.map {
-			let image = ManagedFeedImage(context: backgroundContext)
-			image.id = $0.id
-			image.imageDescription = $0.description
-			image.location = $0.location
-			image.url = $0.url
-
-			return image
-		})
+		cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: backgroundContext) })
 
 		try! backgroundContext.save()
 
@@ -48,14 +40,7 @@ public class CoreDataFeedStore: FeedStore {
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func retrieve(completion: @escaping RetrievalCompletion) {
 		if let cache = try! ManagedCache.fetchCache(in: backgroundContext) {
-			completion(.found(feed: cache.feed
-								.compactMap {
-									$0 as? ManagedFeedImage
-								}
-								.map {
-									LocalFeedImage(id: $0.id, description: $0.imageDescription, location: $0.location, url: $0.url)
-								},
-							  timestamp: cache.timestamp))
+			completion(.found(feed: cache.local, timestamp: cache.timestamp))
 		} else {
 			completion(.empty)
 		}
