@@ -27,6 +27,11 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+		let fetchRequest = ManagedCache.fetchRequest()
+		if let cache = try! backgroundContext.fetch(fetchRequest).first as? ManagedCache {
+			backgroundContext.delete(cache)
+		}
+
 		let cache = ManagedCache(context: backgroundContext)
 		cache.timestamp = timestamp
 		cache.feed = NSOrderedSet(array: feed.map {
