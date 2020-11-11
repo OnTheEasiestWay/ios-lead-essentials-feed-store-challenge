@@ -21,8 +21,7 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		let context = backgroundContext
-		context.perform {
+		perform { context in
 			try! ManagedCache.deleteCache(in: context)
 
 			try! context.save()
@@ -34,8 +33,7 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		let context = backgroundContext
-		context.perform {
+		perform { context in
 			let cache = try! ManagedCache.replaceCache(in: context)
 			cache.timestamp = timestamp
 			cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: context) })
@@ -49,13 +47,19 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		let context = backgroundContext
-		context.perform {
+		perform { context in
 			if let cache = try! ManagedCache.fetchCache(in: context) {
 				completion(.found(feed: cache.local, timestamp: cache.timestamp))
 			} else {
 				completion(.empty)
 			}
+		}
+	}
+
+	private func perform(action: @escaping (NSManagedObjectContext) -> Void) {
+		let context = backgroundContext
+		context.perform {
+			action(context)
 		}
 	}
 }
