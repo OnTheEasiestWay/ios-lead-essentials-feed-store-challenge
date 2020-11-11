@@ -27,12 +27,7 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		let fetchRequest = ManagedCache.fetchRequest()
-		if let cache = try! backgroundContext.fetch(fetchRequest).first as? ManagedCache {
-			backgroundContext.delete(cache)
-		}
-
-		let cache = ManagedCache(context: backgroundContext)
+		let cache = try! ManagedCache.replaceCache(in: backgroundContext)
 		cache.timestamp = timestamp
 		cache.feed = NSOrderedSet(array: feed.map {
 			let image = ManagedFeedImage(context: backgroundContext)
@@ -52,8 +47,7 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		let fetchRequest = ManagedCache.fetchRequest()
-		if let cache = try! backgroundContext.fetch(fetchRequest).first as? ManagedCache {
+		if let cache = try! ManagedCache.fetchCache(in: backgroundContext) {
 			completion(.found(feed: cache.feed
 								.compactMap {
 									$0 as? ManagedFeedImage
