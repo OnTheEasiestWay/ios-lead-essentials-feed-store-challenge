@@ -21,32 +21,41 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		try! ManagedCache.deleteCache(in: backgroundContext)
+		let context = backgroundContext
+		context.perform {
+			try! ManagedCache.deleteCache(in: context)
 
-		try! backgroundContext.save()
+			try! context.save()
 
-		completion(nil)
+			completion(nil)
+		}
 	}
 
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		let cache = try! ManagedCache.replaceCache(in: backgroundContext)
-		cache.timestamp = timestamp
-		cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: backgroundContext) })
+		let context = backgroundContext
+		context.perform {
+			let cache = try! ManagedCache.replaceCache(in: context)
+			cache.timestamp = timestamp
+			cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: context) })
 
-		try! backgroundContext.save()
+			try! context.save()
 
-		completion(nil)
+			completion(nil)
+		}
 	}
 
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		if let cache = try! ManagedCache.fetchCache(in: backgroundContext) {
-			completion(.found(feed: cache.local, timestamp: cache.timestamp))
-		} else {
-			completion(.empty)
+		let context = backgroundContext
+		context.perform {
+			if let cache = try! ManagedCache.fetchCache(in: context) {
+				completion(.found(feed: cache.local, timestamp: cache.timestamp))
+			} else {
+				completion(.empty)
+			}
 		}
 	}
 }
