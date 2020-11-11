@@ -21,7 +21,11 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
+		try! ManagedCache.deleteCache(in: backgroundContext)
 
+		try! backgroundContext.save()
+
+		completion(nil)
 	}
 
 	/// The completion handler can be invoked in any thread.
