@@ -11,9 +11,11 @@ import CoreData
 
 public class CoreDataFeedStore: FeedStore {
 	let persistentContainer: NSPersistentContainer
+	let backgroundContext: NSManagedObjectContext
 
 	public init(model name: String, in bundle: Bundle, storeAt url: URL) throws {
 		persistentContainer = try NSPersistentContainer.load(model: name, in: bundle, storeAt: url)
+		backgroundContext = persistentContainer.newBackgroundContext()
 	}
 
 	/// The completion handler can be invoked in any thread.
@@ -25,13 +27,39 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
+		let cache = ManagedCache(context: backgroundContext)
+		cache.timestamp = timestamp
+		cache.feed = NSOrderedSet(array: feed.map {
+			let image = ManagedFeedImage(context: backgroundContext)
+			image.id = $0.id
+			image.imageDescription = $0.description
+			image.location = $0.location
+			image.url = $0.url
 
+			return image
+		})
+
+		try! backgroundContext.save()
+
+		completion(nil)
 	}
 
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		completion(.empty)
+		let fetchRequest = ManagedCache.fetchRequest()
+		if let cache = try! backgroundContext.fetch(fetchRequest).first as? ManagedCache {
+			completion(.found(feed: cache.feed
+								.compactMap {
+									$0 as? ManagedFeedImage
+								}
+								.map {
+									LocalFeedImage(id: $0.id, description: $0.imageDescription, location: $0.location, url: $0.url)
+								},
+							  timestamp: cache.timestamp))
+		} else {
+			completion(.empty)
+		}
 	}
 }
 
