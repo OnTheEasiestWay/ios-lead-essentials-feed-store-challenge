@@ -17,21 +17,21 @@ public protocol FeedStoreCoreDataCacheOperation {
 	func insert(in context: NSManagedObjectContext) throws -> ManagedCache
 }
 
-public class CoreDataOperation: FeedStoreCoreDataCacheOperation {
+open class CoreDataOperation: FeedStoreCoreDataCacheOperation {
 	public init() { }
 
-	public func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
+	open func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
 		let fetchRequest = ManagedCache.fetchRequest()
 		return try context.fetch(fetchRequest).first as? ManagedCache
 	}
 
-	public func delete(in context: NSManagedObjectContext) throws {
+	open func delete(in context: NSManagedObjectContext) throws {
 		if let cache = try retrieve(in: context) {
 			context.delete(cache)
 		}
 	}
 
-	public func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
+	open func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
 		return ManagedCache(context: context)
 	}
 }

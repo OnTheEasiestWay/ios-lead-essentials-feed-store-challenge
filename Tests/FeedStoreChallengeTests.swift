@@ -158,51 +158,21 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 	}
 
 	// MARK: - Helpers
-	class FailableRetrieveStub: FeedStoreCoreDataCacheOperation {
-		let defaultOperation = CoreDataOperation();
-
-		func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
+	class FailableRetrieveStub: CoreDataOperation {
+		override func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
 			throw NSError(domain: "CoreData Fetch Error", code: -1)
-		}
-
-		func delete(in context: NSManagedObjectContext) throws {
-			try defaultOperation.delete(in: context)
-		}
-
-		func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
-			try defaultOperation.insert(in: context)
 		}
 	}
 
-	class FailableInsertStub: FeedStoreCoreDataCacheOperation {
-		let defaultOperation = CoreDataOperation();
-
-		func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
-			try defaultOperation.retrieve(in: context)
-		}
-
-		func delete(in context: NSManagedObjectContext) throws {
-			try defaultOperation.delete(in: context)
-		}
-
-		func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
+	class FailableInsertStub: CoreDataOperation {
+		override func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
 			throw NSError(domain: "CoreData Insert Error", code: -1)
 		}
 	}
 
-	class FailableDeleteStub: FeedStoreCoreDataCacheOperation {
-		let defaultOperation = CoreDataOperation();
-
-		func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
-			try defaultOperation.retrieve(in: context)
-		}
-
-		func delete(in context: NSManagedObjectContext) throws {
+	class FailableDeleteStub: CoreDataOperation {
+		override func delete(in context: NSManagedObjectContext) throws {
 			throw NSError(domain: "CoreData Delete Error", code: -1)
-		}
-
-		func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
-			try defaultOperation.insert(in: context)
 		}
 	}
 }
