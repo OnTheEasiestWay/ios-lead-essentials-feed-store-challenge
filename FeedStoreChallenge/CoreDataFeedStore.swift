@@ -79,10 +79,14 @@ public class CoreDataFeedStore: FeedStore {
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func retrieve(completion: @escaping RetrievalCompletion) {
 		perform { context, operation in
-			if let cache = try! operation.retrieve(in: context) {
-				completion(.found(feed: cache.local, timestamp: cache.timestamp))
-			} else {
-				completion(.empty)
+			do {
+				if let cache = try operation.retrieve(in: context) {
+					completion(.found(feed: cache.local, timestamp: cache.timestamp))
+				} else {
+					completion(.empty)
+				}
+			} catch {
+				completion(.failure(error))
 			}
 		}
 	}

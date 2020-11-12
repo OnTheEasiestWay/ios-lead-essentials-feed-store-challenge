@@ -93,11 +93,11 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	
 	// - MARK: Helpers
 	
-	private func makeSUT() -> FeedStore {
+	private func makeSUT(coreDataOperation: FeedStoreCoreDataCacheOperation = CoreDataOperation()) -> FeedStore {
 		// Set file url with path: `/dev/null` to use in-memory SQLite for test cases
 		let url = URL(fileURLWithPath: "/dev/null")
 		let bundle = Bundle.init(for: CoreDataFeedStore.self)
-		let sut = try! CoreDataFeedStore(model: "FeedStore", in: bundle, storeAt: url)
+		let sut = try! CoreDataFeedStore(model: "FeedStore", in: bundle, storeAt: url, coreDataOperation: coreDataOperation)
 
 		return sut
 	}
@@ -112,50 +112,65 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 //
 //  ***********************
 
-//extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
-//
-//	func test_retrieve_deliversFailureOnRetrievalError() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
-//	}
-//
-//	func test_retrieve_hasNoSideEffectsOnFailure() {
-////		let sut = makeSUT()
-////
-////		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
-//	}
-//
-//}
+extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
+	func test_retrieve_deliversFailureOnRetrievalError() {
+		let sut = makeSUT(coreDataOperation: FailableRetrieveStub())
 
-//extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
-//
-//	func test_insert_deliversErrorOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertDeliversErrorOnInsertionError(on: sut)
-//	}
-//
-//	func test_insert_hasNoSideEffectsOnInsertionError() {
-////		let sut = makeSUT()
-////
-////		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
-//	}
-//
-//}
+		assertThatRetrieveDeliversFailureOnRetrievalError(on: sut)
+	}
 
-//extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+	func test_retrieve_hasNoSideEffectsOnFailure() {
+//		let sut = makeSUT()
 //
-//	func test_delete_deliversErrorOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
-//	}
+//		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+	}
+
+}
+
+extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
+
+	func test_insert_deliversErrorOnInsertionError() {
+//		let sut = makeSUT()
 //
-//	func test_delete_hasNoSideEffectsOnDeletionError() {
-////		let sut = makeSUT()
-////
-////		assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
-//	}
+//		assertThatInsertDeliversErrorOnInsertionError(on: sut)
+	}
+
+	func test_insert_hasNoSideEffectsOnInsertionError() {
+//		let sut = makeSUT()
 //
-//}
+//		assertThatInsertHasNoSideEffectsOnInsertionError(on: sut)
+	}
+
+}
+
+extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
+
+	func test_delete_deliversErrorOnDeletionError() {
+//		let sut = makeSUT()
+//
+//		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
+	}
+
+	func test_delete_hasNoSideEffectsOnDeletionError() {
+//		let sut = makeSUT()
+//
+//		assertThatDeleteHasNoSideEffectsOnDeletionError(on: sut)
+	}
+
+	// MARK: - Helpers
+	class FailableRetrieveStub: FeedStoreCoreDataCacheOperation {
+		let defaultOperation = CoreDataOperation();
+
+		func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
+			throw NSError(domain: "CoreData Fetch Error", code: -1)
+		}
+
+		func delete(in context: NSManagedObjectContext) throws {
+			try defaultOperation.delete(in: context)
+		}
+
+		func replace(in context: NSManagedObjectContext) throws -> ManagedCache {
+			try defaultOperation.replace(in: context)
+		}
+	}
+}
