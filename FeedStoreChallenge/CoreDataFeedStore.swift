@@ -9,20 +9,51 @@
 import Foundation
 import CoreData
 
+public protocol FeedStoreCoreDataCacheOperation {
+	func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache?
+
+	func delete(in context: NSManagedObjectContext) throws
+
+	func replace(in context: NSManagedObjectContext) throws -> ManagedCache
+}
+
+public class CoreDataOperation: FeedStoreCoreDataCacheOperation {
+	public init() { }
+
+	public func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
+		let fetchRequest = ManagedCache.fetchRequest()
+		return try context.fetch(fetchRequest).first as? ManagedCache
+	}
+
+	public func delete(in context: NSManagedObjectContext) throws {
+		if let cache = try retrieve(in: context) {
+			context.delete(cache)
+		}
+	}
+
+	public func replace(in context: NSManagedObjectContext) throws -> ManagedCache {
+		try delete(in: context)
+
+		return ManagedCache(context: context)
+	}
+}
+
 public class CoreDataFeedStore: FeedStore {
 	let persistentContainer: NSPersistentContainer
 	let backgroundContext: NSManagedObjectContext
+	let coreDataOperation: FeedStoreCoreDataCacheOperation
 
-	public init(model name: String, in bundle: Bundle, storeAt url: URL) throws {
+	public init(model name: String, in bundle: Bundle, storeAt url: URL, coreDataOperation: FeedStoreCoreDataCacheOperation = CoreDataOperation()) throws {
 		persistentContainer = try NSPersistentContainer.load(model: name, in: bundle, storeAt: url)
 		backgroundContext = persistentContainer.newBackgroundContext()
+		self.coreDataOperation = coreDataOperation
 	}
 
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
-		perform { context in
-			try! ManagedCache.deleteCache(in: context)
+		perform { context, operation in
+			try! operation.delete(in: context)
 
 			try! context.save()
 
@@ -33,8 +64,8 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
-		perform { context in
-			let cache = try! ManagedCache.replaceCache(in: context)
+		perform { context, operation in
+			let cache = try! operation.replace(in: context)
 			cache.timestamp = timestamp
 			cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: context) })
 
@@ -47,8 +78,8 @@ public class CoreDataFeedStore: FeedStore {
 	/// The completion handler can be invoked in any thread.
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func retrieve(completion: @escaping RetrievalCompletion) {
-		perform { context in
-			if let cache = try! ManagedCache.fetchCache(in: context) {
+		perform { context, operation in
+			if let cache = try! operation.retrieve(in: context) {
 				completion(.found(feed: cache.local, timestamp: cache.timestamp))
 			} else {
 				completion(.empty)
@@ -56,10 +87,11 @@ public class CoreDataFeedStore: FeedStore {
 		}
 	}
 
-	private func perform(action: @escaping (NSManagedObjectContext) -> Void) {
+	private func perform(action: @escaping (NSManagedObjectContext, FeedStoreCoreDataCacheOperation) -> Void) {
 		let context = backgroundContext
+		let operation = coreDataOperation
 		context.perform {
-			action(context)
+			action(context, operation)
 		}
 	}
 }

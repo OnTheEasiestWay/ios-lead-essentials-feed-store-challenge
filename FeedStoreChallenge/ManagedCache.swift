@@ -11,7 +11,7 @@ import Foundation
 import CoreData
 
 @objc(ManagedCache)
-class ManagedCache: NSManagedObject {
+public class ManagedCache: NSManagedObject {
 	@NSManaged var timestamp: Date
 	@NSManaged var feed: NSOrderedSet
 }
@@ -24,22 +24,5 @@ extension ManagedCache {
 								  description: $0.imageDescription,
 								  location: $0.location,
 								  url: $0.url)}
-	}
-
-	static func fetchCache(in context: NSManagedObjectContext) throws -> ManagedCache? {
-		let fetchRequest = ManagedCache.fetchRequest()
-		return try context.fetch(fetchRequest).first as? ManagedCache
-	}
-
-	static func deleteCache(in context: NSManagedObjectContext) throws {
-		if let cache = try ManagedCache.fetchCache(in: context) {
-			context.delete(cache)
-		}
-	}
-
-	static func replaceCache(in context: NSManagedObjectContext) throws -> ManagedCache {
-		try ManagedCache.deleteCache(in: context)
-
-		return ManagedCache(context: context)
 	}
 }
