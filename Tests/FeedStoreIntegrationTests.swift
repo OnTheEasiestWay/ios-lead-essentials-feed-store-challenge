@@ -76,15 +76,28 @@ class FeedStoreIntegrationTests: XCTestCase {
     // - MARK: Helpers
     
     private func makeSUT() -> FeedStore {
-        fatalError("Must be implemented")
-    }
-    
-    private func setupEmptyStoreState() {
+        let url = storeURL()
+        let bundle = Bundle(for: CoreDataFeedStore.self)
+        let sut = try! CoreDataFeedStore(model: "FeedStore", in: bundle, storeAt: url)
 
+        return sut
+    }
+
+    private func setupEmptyStoreState() {
+        removeStore(url: storeURL())
     }
 
     private func undoStoreSideEffects() {
-
+        removeStore(url: storeURL())
     }
-    
+
+    private func removeStore(url: URL) {
+        try? FileManager.default.removeItem(at: url)
+    }
+
+    private func storeURL() -> URL {
+        var url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        url.appendPathComponent("\(type(of: self)).sqlite3")
+        return url
+    }
 }
