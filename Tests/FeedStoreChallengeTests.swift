@@ -169,8 +169,8 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 			try defaultOperation.delete(in: context)
 		}
 
-		func replace(in context: NSManagedObjectContext) throws -> ManagedCache {
-			try defaultOperation.replace(in: context)
+		func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
+			try defaultOperation.insert(in: context)
 		}
 	}
 
@@ -185,7 +185,7 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 			try defaultOperation.delete(in: context)
 		}
 
-		func replace(in context: NSManagedObjectContext) throws -> ManagedCache {
+		func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
 			throw NSError(domain: "CoreData Insert Error", code: -1)
 		}
 	}

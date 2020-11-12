@@ -14,7 +14,7 @@ public protocol FeedStoreCoreDataCacheOperation {
 
 	func delete(in context: NSManagedObjectContext) throws
 
-	func replace(in context: NSManagedObjectContext) throws -> ManagedCache
+	func insert(in context: NSManagedObjectContext) throws -> ManagedCache
 }
 
 public class CoreDataOperation: FeedStoreCoreDataCacheOperation {
@@ -31,9 +31,7 @@ public class CoreDataOperation: FeedStoreCoreDataCacheOperation {
 		}
 	}
 
-	public func replace(in context: NSManagedObjectContext) throws -> ManagedCache {
-		try delete(in: context)
-
+	public func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
 		return ManagedCache(context: context)
 	}
 }
@@ -66,7 +64,8 @@ public class CoreDataFeedStore: FeedStore {
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
 		perform { context, operation in
 			do {
-				let cache = try operation.replace(in: context)
+				try operation.delete(in: context)
+				let cache = try operation.insert(in: context)
 				cache.timestamp = timestamp
 				cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: context) })
 
