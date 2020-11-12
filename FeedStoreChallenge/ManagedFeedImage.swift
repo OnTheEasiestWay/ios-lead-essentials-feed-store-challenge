@@ -26,6 +26,6 @@ extension ManagedFeedImage {
 		self.id = local.id
 		self.url = local.url
 		self.location = local.location
-		self.imageDescription = location?.description
+		self.imageDescription = local.description
 	}
 }
