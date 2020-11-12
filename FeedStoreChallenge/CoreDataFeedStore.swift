@@ -65,13 +65,17 @@ public class CoreDataFeedStore: FeedStore {
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func insert(_ feed: [LocalFeedImage], timestamp: Date, completion: @escaping InsertionCompletion) {
 		perform { context, operation in
-			let cache = try! operation.replace(in: context)
-			cache.timestamp = timestamp
-			cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: context) })
+			do {
+				let cache = try operation.replace(in: context)
+				cache.timestamp = timestamp
+				cache.feed = NSOrderedSet(array: feed.map { ManagedFeedImage(from: $0, in: context) })
 
-			try! context.save()
+				try context.save()
 
-			completion(nil)
+				completion(nil)
+			} catch {
+				completion(error)
+			}
 		}
 	}
 

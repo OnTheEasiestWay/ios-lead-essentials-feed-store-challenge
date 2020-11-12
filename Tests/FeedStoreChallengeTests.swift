@@ -130,9 +130,9 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 
 	func test_insert_deliversErrorOnInsertionError() {
-//		let sut = makeSUT()
-//
-//		assertThatInsertDeliversErrorOnInsertionError(on: sut)
+		let sut = makeSUT(coreDataOperation: FailableInsertStub())
+
+		assertThatInsertDeliversErrorOnInsertionError(on: sut)
 	}
 
 	func test_insert_hasNoSideEffectsOnInsertionError() {
@@ -171,6 +171,22 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 
 		func replace(in context: NSManagedObjectContext) throws -> ManagedCache {
 			try defaultOperation.replace(in: context)
+		}
+	}
+
+	class FailableInsertStub: FeedStoreCoreDataCacheOperation {
+		let defaultOperation = CoreDataOperation();
+
+		func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
+			try defaultOperation.retrieve(in: context)
+		}
+
+		func delete(in context: NSManagedObjectContext) throws {
+			try defaultOperation.delete(in: context)
+		}
+
+		func replace(in context: NSManagedObjectContext) throws -> ManagedCache {
+			throw NSError(domain: "CoreData Insert Error", code: -1)
 		}
 	}
 }
