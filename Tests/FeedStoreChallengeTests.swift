@@ -160,7 +160,7 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 	// MARK: - Helpers
 	class FailableRetrieveStub: CoreDataOperation {
 		override func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
-			throw NSError(domain: "CoreData Fetch Error", code: -1)
+			throw NSError(domain: "CoreData Retrieve Error", code: -1)
 		}
 	}
 
