@@ -120,9 +120,9 @@ extension FeedStoreChallengeTests: FailableRetrieveFeedStoreSpecs {
 	}
 
 	func test_retrieve_hasNoSideEffectsOnFailure() {
-//		let sut = makeSUT()
-//
-//		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
+		let sut = makeSUT(coreDataOperation: FailableRetrieveStub())
+
+		assertThatRetrieveHasNoSideEffectsOnFailure(on: sut)
 	}
 
 }
