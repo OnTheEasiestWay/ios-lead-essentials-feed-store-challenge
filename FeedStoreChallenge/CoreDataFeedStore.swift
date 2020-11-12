@@ -37,9 +37,9 @@ open class CoreDataOperation: FeedStoreCoreDataCacheOperation {
 }
 
 public class CoreDataFeedStore: FeedStore {
-	let persistentContainer: NSPersistentContainer
-	let backgroundContext: NSManagedObjectContext
-	let coreDataOperation: FeedStoreCoreDataCacheOperation
+	private let persistentContainer: NSPersistentContainer
+	private let backgroundContext: NSManagedObjectContext
+	private let coreDataOperation: FeedStoreCoreDataCacheOperation
 
 	public init(model name: String, in bundle: Bundle, storeAt url: URL, coreDataOperation: FeedStoreCoreDataCacheOperation = CoreDataOperation()) throws {
 		persistentContainer = try NSPersistentContainer.load(model: name, in: bundle, storeAt: url)
