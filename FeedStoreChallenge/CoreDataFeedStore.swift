@@ -51,11 +51,15 @@ public class CoreDataFeedStore: FeedStore {
 	/// Clients are responsible to dispatch to appropriate threads, if needed.
 	public func deleteCachedFeed(completion: @escaping DeletionCompletion) {
 		perform { context, operation in
-			try! operation.delete(in: context)
+			do {
+				try operation.delete(in: context)
 
-			try! context.save()
+				try context.save()
 
-			completion(nil)
+				completion(nil)
+			} catch {
+				completion(error)
+			}
 		}
 	}
 

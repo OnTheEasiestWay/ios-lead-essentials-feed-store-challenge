@@ -146,9 +146,9 @@ extension FeedStoreChallengeTests: FailableInsertFeedStoreSpecs {
 extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 
 	func test_delete_deliversErrorOnDeletionError() {
-//		let sut = makeSUT()
-//
-//		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
+		let sut = makeSUT(coreDataOperation: FailableDeleteStub())
+
+		assertThatDeleteDeliversErrorOnDeletionError(on: sut)
 	}
 
 	func test_delete_hasNoSideEffectsOnDeletionError() {
@@ -187,6 +187,22 @@ extension FeedStoreChallengeTests: FailableDeleteFeedStoreSpecs {
 
 		func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
 			throw NSError(domain: "CoreData Insert Error", code: -1)
+		}
+	}
+
+	class FailableDeleteStub: FeedStoreCoreDataCacheOperation {
+		let defaultOperation = CoreDataOperation();
+
+		func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
+			try defaultOperation.retrieve(in: context)
+		}
+
+		func delete(in context: NSManagedObjectContext) throws {
+			throw NSError(domain: "CoreData Delete Error", code: -1)
+		}
+
+		func insert(in context: NSManagedObjectContext) throws -> ManagedCache {
+			try defaultOperation.insert(in: context)
 		}
 	}
 }
