@@ -9,15 +9,7 @@
 import Foundation
 import CoreData
 
-public protocol FeedStoreCoreDataCacheOperation {
-	func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache?
-
-	func delete(in context: NSManagedObjectContext) throws
-
-	func insert(in context: NSManagedObjectContext) throws -> ManagedCache
-}
-
-open class CoreDataOperation: FeedStoreCoreDataCacheOperation {
+open class CoreDataOperation {
 	public init() { }
 
 	open func retrieve(in context: NSManagedObjectContext) throws -> ManagedCache? {
@@ -47,9 +39,9 @@ public class CoreDataFeedStore: FeedStore {
 
 	private let persistentContainer: NSPersistentContainer
 	private let backgroundContext: NSManagedObjectContext
-	private let coreDataOperation: FeedStoreCoreDataCacheOperation
+	private let coreDataOperation: CoreDataOperation
 
-	public init(storeAt url: URL, with coreDataOperation: FeedStoreCoreDataCacheOperation = CoreDataOperation()) throws {
+	public init(storeAt url: URL, with coreDataOperation: CoreDataOperation = CoreDataOperation()) throws {
 		guard let model = CoreDataFeedStore.model else {
 			throw Error.modelFailure
 		}
@@ -114,7 +106,7 @@ public class CoreDataFeedStore: FeedStore {
 		}
 	}
 
-	private func perform(action: @escaping (NSManagedObjectContext, FeedStoreCoreDataCacheOperation) -> Void) {
+	private func perform(action: @escaping (NSManagedObjectContext, CoreDataOperation) -> Void) {
 		let context = backgroundContext
 		let operation = coreDataOperation
 		context.perform {
