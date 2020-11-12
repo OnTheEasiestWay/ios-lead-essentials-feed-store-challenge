@@ -15,7 +15,7 @@ extension XCTestCase {
     }
     
     func uniqueImage() -> LocalFeedImage {
-        return LocalFeedImage(id: UUID(), description: "any", location: "any", url: anyURL())
+        return LocalFeedImage(id: UUID(), description: "any description", location: "any location", url: anyURL())
     }
     
     func anyURL() -> URL {
