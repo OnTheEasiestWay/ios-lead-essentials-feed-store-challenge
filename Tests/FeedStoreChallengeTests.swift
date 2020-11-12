@@ -96,8 +96,7 @@ class FeedStoreChallengeTests: XCTestCase, FeedStoreSpecs {
 	private func makeSUT(coreDataOperation: FeedStoreCoreDataCacheOperation = CoreDataOperation()) -> FeedStore {
 		// Set file url with path: `/dev/null` to use in-memory SQLite for test cases
 		let url = URL(fileURLWithPath: "/dev/null")
-		let bundle = Bundle.init(for: CoreDataFeedStore.self)
-		let sut = try! CoreDataFeedStore(model: "FeedStore", in: bundle, storeAt: url, coreDataOperation: coreDataOperation)
+		let sut = try! CoreDataFeedStore(storeAt: url, with: coreDataOperation)
 
 		return sut
 	}

@@ -37,14 +37,30 @@ open class CoreDataOperation: FeedStoreCoreDataCacheOperation {
 }
 
 public class CoreDataFeedStore: FeedStore {
+	private enum Error: Swift.Error {
+		case modelFailure
+		case persistentContainerFailure(Swift.Error)
+	}
+
+	private static let modelName = "FeedStore"
+	private static let model = NSManagedObjectModel.model(with: modelName, in: Bundle.init(for: CoreDataFeedStore.self))
+
 	private let persistentContainer: NSPersistentContainer
 	private let backgroundContext: NSManagedObjectContext
 	private let coreDataOperation: FeedStoreCoreDataCacheOperation
 
-	public init(model name: String, in bundle: Bundle, storeAt url: URL, coreDataOperation: FeedStoreCoreDataCacheOperation = CoreDataOperation()) throws {
-		persistentContainer = try NSPersistentContainer.load(model: name, in: bundle, storeAt: url)
-		backgroundContext = persistentContainer.newBackgroundContext()
-		self.coreDataOperation = coreDataOperation
+	public init(storeAt url: URL, with coreDataOperation: FeedStoreCoreDataCacheOperation = CoreDataOperation()) throws {
+		guard let model = CoreDataFeedStore.model else {
+			throw Error.modelFailure
+		}
+
+		do {
+			persistentContainer = try NSPersistentContainer.load(name: CoreDataFeedStore.modelName, model: model, storeAt: url)
+			backgroundContext = persistentContainer.newBackgroundContext()
+			self.coreDataOperation = coreDataOperation
+		} catch {
+			throw Error.persistentContainerFailure(error)
+		}
 	}
 
 	/// The completion handler can be invoked in any thread.
@@ -115,16 +131,7 @@ extension NSManagedObjectModel {
 
 
 extension NSPersistentContainer {
-	enum LoadingError: Swift.Error {
-		case modelFailure
-		case persistentContainerFailure(Swift.Error)
-	}
-
-	static func load(model name: String, in bundle: Bundle, storeAt url: URL) throws -> NSPersistentContainer {
-		guard let model = NSManagedObjectModel.model(with: name, in: bundle) else {
-			throw LoadingError.modelFailure
-		}
-
+	static func load(name: String, model: NSManagedObjectModel, storeAt url: URL) throws -> NSPersistentContainer {
 		let description = NSPersistentStoreDescription(url: url)
 		// Make sure `loadPersistentStores`'s completion is called synchronously
 		description.shouldAddStoreAsynchronously = false
@@ -134,7 +141,7 @@ extension NSPersistentContainer {
 
 		var capturedError: Swift.Error?
 		persistentContainer.loadPersistentStores { capturedError = $1 }
-		try capturedError.map { throw LoadingError.persistentContainerFailure($0) }
+		try capturedError.map { throw $0 }
 
 		return persistentContainer
 	}

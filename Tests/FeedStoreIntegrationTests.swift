@@ -77,8 +77,7 @@ class FeedStoreIntegrationTests: XCTestCase {
     
     private func makeSUT() -> FeedStore {
         let url = storeURL()
-        let bundle = Bundle(for: CoreDataFeedStore.self)
-        let sut = try! CoreDataFeedStore(model: "FeedStore", in: bundle, storeAt: url)
+        let sut = try! CoreDataFeedStore(storeAt: url)
 
         return sut
     }
