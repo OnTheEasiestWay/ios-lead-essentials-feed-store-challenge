@@ -133,7 +133,6 @@ extension NSManagedObjectModel {
 extension NSPersistentContainer {
 	static func load(name: String, model: NSManagedObjectModel, storeAt url: URL) throws -> NSPersistentContainer {
 		let description = NSPersistentStoreDescription(url: url)
-		// Make sure `loadPersistentStores`'s completion is called synchronously
 		description.shouldAddStoreAsynchronously = false
 
 		let persistentContainer = NSPersistentContainer(name: name, managedObjectModel: model)
